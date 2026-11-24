@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registro de conductas</title>
+<style>
+:root{--bg:#faf8f5;--card:#fff;--tx:#2b2b2b;--mu:#6b6b6b;--bd:#e4ded6;--ac:#3f6f7e;--acx:#fff;--sel:#e3f0f3;--warn:#fff6e0;--warnb:#e2c46a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1c1c1e;--card:#2a2a2d;--tx:#f0f0f0;--mu:#a0a0a5;--bd:#3d3d42;--ac:#7fb5c5;--acx:#10272e;--sel:#27414a;--warn:#3a3322;--warnb:#8a7330;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 10px}
+h2{font-size:17px;margin:22px 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.nota{background:var(--warn);border:1px solid var(--warnb);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:14px}
+label{display:block;font-size:14px;color:var(--mu);margin:12px 0 5px}
+input,select{width:100%;padding:10px;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px}
+.faces{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.face{border:2px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:12px;padding:8px 4px;font:inherit;font-size:13px;cursor:pointer;text-align:center}
+.face span{display:block;font-size:34px;line-height:1.2}
+.face.on{border-color:var(--ac);background:var(--sel)}
+.face:focus-visible,.btn:focus-visible,.btn2:focus-visible{outline:3px solid #f0b429;outline-offset:2px}
+.btn{width:100%;margin-top:16px;padding:13px;border:0;border-radius:12px;background:var(--ac);color:var(--acx);font:inherit;font-weight:600;cursor:pointer}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn2{flex:1;min-width:140px;padding:11px;border:2px solid var(--ac);border-radius:12px;background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer;text-align:center}
+.item{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.item .e{font-size:30px;line-height:1.1;max-width:84px}
+.item b{display:block}
+.item small{color:var(--mu);display:block}
+.del{margin-left:auto;background:none;border:0;color:var(--mu);font-size:20px;cursor:pointer;padding:0 4px}
+.empty{color:var(--mu);text-align:center;padding:14px}
+.hide{display:none}
+.dd{border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
+.dd summary{padding:10px;cursor:pointer;list-style:none}
+.dd summary::-webkit-details-marker{display:none}
+.dd summary::after{content:"▾";float:right}
+.dd .ck{display:flex;gap:10px;align-items:center;color:var(--tx);font-size:16px;margin:0;padding:10px;border-top:1px solid var(--bd);cursor:pointer}
+.ck input{width:auto}
+#informe{display:none}
+@page{size:A4 portrait;margin:15mm}
+@media print{
+  main{display:none}
+  body{background:#fff;color:#000;padding:0}
+  #informe{display:block;font:10pt/1.35 Arial,Helvetica,sans-serif;color:#000}
+  #informe h1{text-align:center;font-size:15pt;margin:0 0 4px}
+  #informe p{text-align:center;margin:2px 0}
+  #informe table{width:100%;border-collapse:collapse;margin-top:12px}
+  #informe th,#informe td{border:1px solid #555;padding:4px 5px;vertical-align:top;text-align:left}
+  #informe th{background:#e4e4e4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #informe thead{display:table-header-group}
+  #informe tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Registro de conductas</h1>
+<div class="nota">Los registros se guardan <strong>solo en este navegador y en este dispositivo</strong>; no se envían a ningún sitio. No escribas nombres ni datos que identifiquen al alumno o alumna. Usa «Guardar copia» de vez en cuando para no perderlos.</div>
+
+<div class="card">
+  <label for="fecha">Fecha</label><input type="date" id="fecha">
+  <label id="lblComp">Comportamiento (puedes marcar varios)</label>
+  <div class="faces" id="faces" role="group" aria-labelledby="lblComp"></div>
+  <div id="otroBox" class="hide">
+    <label for="otro">Describe el comportamiento</label>
+    <input id="otro" placeholder="Ej.: se esconde debajo de la mesa">
+    <label id="lblCara">Carita para este comportamiento</label>
+    <div class="faces" id="faces2" role="group" aria-labelledby="lblCara"></div>
+  </div>
+  <label>Personas implicadas</label>
+  <details class="dd" id="personas"><summary id="pres">Seleccionar</summary>
+    <label class="ck"><input type="checkbox" value="Tutora">Tutora</label>
+    <label class="ck"><input type="checkbox" value="ZTS">ZTS</label>
+    <label class="ck"><input type="checkbox" value="PTIS">PTIS</label>
+    <label class="ck"><input type="checkbox" value="Religión">Religión</label>
+    <label class="ck"><input type="checkbox" value="PT">PT</label>
+    <label class="ck"><input type="checkbox" value="Maestr@ sustitut@">Maestr@ sustitut@</label>
+  </details>
+  <label for="motivo">Motivo que lo desencadena</label>
+  <select id="motivo"><option value="">Seleccionar</option><option>Quiere salir de la clase</option><option>Quiere estar en el baño</option><option>Quiere que la cojas en brazos</option><option>Otros</option></select>
+  <input id="motivoOtro" class="hide" placeholder="Especifica el motivo" style="margin-top:8px" aria-label="Especifica el motivo">
+  <label for="dur">Duración (minutos)</label>
+  <input type="number" id="dur" min="0" inputmode="numeric" placeholder="Ej.: 10">
+  <button class="btn" id="guardar" type="button">Guardar registro</button>
+</div>
+
+<h2>Informe semanal</h2>
+<div class="card">
+  <label for="semana">Elige cualquier día de la semana</label>
+  <input type="date" id="semana">
+  <button class="btn" id="pdf" type="button">Imprimir o guardar PDF de la semana</button>
+</div>
+
+<h2>Copia de seguridad</h2>
+<div class="card">
+  <p style="margin:0;font-size:14px;color:var(--mu)">Para pasar los registros a otro dispositivo o no perderlos si se borra el navegador.</p>
+  <div class="btns">
+    <button class="btn2" id="exportar" type="button">Guardar copia</button>
+    <button class="btn2" id="importarBtn" type="button">Recuperar copia</button>
+    <input type="file" id="importar" accept="application/json,.json" class="hide">
+  </div>
+</div>
+
+<h2>Registros</h2>
+<div id="lista"></div>
+</main>
+
+<section id="informe" aria-hidden="true"></section>
+
+<script>
+const B=[
+ {e:"😢",t:"Llanto"},{e:"🤬",t:"Rabieta"},{e:"😫",t:"Patalea y se lanza al suelo"},
+ {e:"😡",t:"Lanza juguetes/carrito aseo"},{e:"😱",t:"Grita"},{e:"🤕",t:"Pega / empuja"},
+ {e:"😖",t:"Muerde"},{e:"🏃",t:"Sale corriendo"},{e:"😭",t:"Entra llorando y enfadada"},{e:"✏️",t:"Otro",otro:true}
+];
+const F=["😐","😟","😡","😭","😱","😤","🥺","😳","🙃","😴","🤗","😎"];
+const KEY="registro-conductas";
+const $=id=>document.getElementById(id);
+let sel=new Set(),face2="😐",datos=[];
+try{datos=JSON.parse(localStorage.getItem(KEY)||"[]")||[]}catch(e){datos=[]}
+function guardarLS(){try{localStorage.setItem(KEY,JSON.stringify(datos))}catch(e){alert("Este navegador no deja guardar datos. Prueba con otro o sal del modo privado.")}}
+
+function p2(n){return String(n).padStart(2,"0")}
+function iso(x){return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())}
+function hoy(){return iso(new Date())}
+function ahora(){const d=new Date();return p2(d.getHours())+":"+p2(d.getMinutes())}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function fmt(f){const [y,m,d]=String(f).split("-");return d+"/"+m+"/"+y}
+
+function pintarCaras(){
+  $("faces").innerHTML=B.map((b,i)=>`<button type="button" class="face${sel.has(i)?" on":""}" data-i="${i}" aria-pressed="${sel.has(i)}"><span aria-hidden="true">${b.e}</span>${b.t}</button>`).join("");
+  $("faces2").innerHTML=F.map(f=>`<button type="button" class="face${face2===f?" on":""}" data-f="${f}" aria-pressed="${face2===f}"><span>${f}</span></button>`).join("");
+  $("otroBox").classList.toggle("hide",![...sel].some(i=>B[i].otro));
+}
+$("faces").onclick=e=>{const b=e.target.closest(".face");if(b){const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);pintarCaras()}};
+$("faces2").onclick=e=>{const b=e.target.closest(".face");if(b){face2=b.dataset.f;pintarCaras()}};
+
+function pintarLista(){
+  if(!datos.length){$("lista").innerHTML='<div class="empty">Todavía no hay registros.</div>';return}
+  const o=[...datos].sort((a,b)=>String(b.ts||b.fecha).localeCompare(String(a.ts||a.fecha)));
+  $("lista").innerHTML=o.map(r=>`<div class="card item"><div class="e" aria-hidden="true">${esc(r.e)}</div><div><b>${esc(r.t)}</b><small>${fmt(r.fecha)}${r.dur?" · "+esc(r.dur)+" min":""}</small>${r.personas?`<small>Con: ${esc(r.personas)}</small>`:""}${r.motivo?`<small>Motivo: ${esc(r.motivo)}</small>`:""}</div><button class="del" data-id="${esc(r.id)}" aria-label="Borrar registro del ${fmt(r.fecha)}">✕</button></div>`).join("");
+}
+$("lista").onclick=e=>{const b=e.target.closest(".del");if(b&&confirm("¿Borrar este registro?")){datos=datos.filter(r=>String(r.id)!==b.dataset.id);guardarLS();pintarLista()}};
+
+function getPersonas(){return [...document.querySelectorAll("#personas input:checked")].map(i=>i.value)}
+function resumen(){const p=getPersonas();$("pres").textContent=p.length?p.join(", "):"Seleccionar"}
+$("personas").addEventListener("change",resumen);
+$("motivo").addEventListener("change",()=>$("motivoOtro").classList.toggle("hide",$("motivo").value!=="Otros"));
+
+$("guardar").onclick=()=>{
+  if(!sel.size){alert("Elige al menos un comportamiento.");return}
+  const es=[],ts=[];
+  for(const i of [...sel].sort((x,y)=>x-y)){const b=B[i];if(b.otro){const o=$("otro").value.trim();if(!o){alert("Describe el comportamiento.");return}es.push(face2);ts.push(o)}else{es.push(b.e);ts.push(b.t)}}
+  const fecha=$("fecha").value||hoy();
+  const mo=$("motivo").value==="Otros"&&$("motivoOtro").value.trim()?"Otros: "+$("motivoOtro").value.trim():$("motivo").value;
+  datos.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,6),fecha,ts:fecha+"T"+ahora(),e:es.join(" "),t:ts.join(", "),personas:getPersonas().join(", "),motivo:mo,dur:$("dur").value});
+  guardarLS();
+  ["motivo","motivoOtro","dur","otro"].forEach(i=>$(i).value="");$("motivoOtro").classList.add("hide");
+  document.querySelectorAll("#personas input").forEach(i=>i.checked=false);$("personas").open=false;resumen();
+  sel=new Set();face2="😐";pintarCaras();pintarLista();
+};
+
+function lunes(s){const [y,m,d]=s.split("-").map(Number);const x=new Date(y,m-1,d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+$("pdf").onclick=()=>{
+  const ini=lunes($("semana").value||hoy()),fin=new Date(ini);fin.setDate(fin.getDate()+6);
+  const a=iso(ini),b=iso(fin);
+  const L=datos.filter(r=>r.fecha>=a&&r.fecha<=b).sort((x,y)=>String(x.ts||x.fecha).localeCompare(String(y.ts||y.fecha)));
+  let h=`<h1>REGISTRO DE CONDUCTAS</h1><p>Periodo: del ${fmt(a)} al ${fmt(b)}</p><p style="font-size:9pt">Fecha de emisión: ${fmt(hoy())}</p>`;
+  if(!L.length)h+=`<p style="text-align:left;margin-top:14px">No constan registros en el periodo indicado.</p>`;
+  else h+=`<table><thead><tr><th style="width:13%">Fecha</th><th style="width:11%">Duración</th><th style="width:24%">Comportamiento</th><th style="width:24%">Personas implicadas</th><th>Motivo desencadenante</th></tr></thead><tbody>`+
+    L.map(r=>`<tr><td>${fmt(r.fecha)}</td><td>${r.dur?esc(r.dur)+" min":"-"}</td><td>${esc(r.t)}</td><td>${esc(r.personas)||"-"}</td><td>${esc(r.motivo)||"-"}</td></tr>`).join("")+`</tbody></table>`;
+  $("informe").innerHTML=h;
+  const t=document.title;document.title="registro-conductas-"+a;
+  window.print();
+  setTimeout(()=>{document.title=t},500);
+};
+
+$("exportar").onclick=()=>{
+  const blob=new Blob([JSON.stringify(datos,null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="copia-registro-conductas-"+hoy()+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+$("importarBtn").onclick=()=>$("importar").click();
+$("importar").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const n=JSON.parse(await f.text());if(!Array.isArray(n))throw 0;
+    const ids=new Set(datos.map(r=>String(r.id)));let k=0;
+    n.forEach(r=>{if(r&&r.fecha&&r.t&&!ids.has(String(r.id))){datos.push(r);k++}});
+    guardarLS();pintarLista();alert(k?`Se han añadido ${k} registros.`:"No había registros nuevos en la copia.");
+  }catch(err){alert("Ese archivo no es una copia válida del registro.")}
+  e.target.value="";
+};
+
+$("semana").value=hoy();$("fecha").value=hoy();
+pintarCaras();pintarLista();
+</script>
+</body>
+</html>
